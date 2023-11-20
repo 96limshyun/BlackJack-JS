@@ -1,11 +1,16 @@
-const messageBox = document.querySelector("#message");
-const playerAssetMessageBox = document.querySelector("#player-asset");
-const youCards = document.querySelector("#you-cards");
-const sumBox = document.querySelector("#sum");
-let input = document.querySelector("#input");
+const infoTextBox = document.querySelector(".info");
+const youCardsTextBox = document.querySelector(".you-cards");
+const sumTextBox = document.querySelector(".sum");
+const playerAssetTextBox = document.querySelector(".player-asset");
+const input = document.querySelector("#input");
+const getAndStopCardBox = document.querySelector(".get-card-box");
+const endGameBtnBox = document.querySelector(".end-box");
+const inputBox = document.querySelector(".input-box");
+const codeSquadBtnBox = document.querySelector(".code-squad");
+const resetBtnBox = document.querySelector(".reset-game");
+const startBtnBox =  document.querySelector("#start-btn");
 
 let playerAsset = 1000;
-let alive = false;
 let youCardArray = [];
 let dealerCardArray = [];
 let youCardSum = 0;
@@ -15,21 +20,63 @@ let lose = 0;
 let draws = 0;
 let round = 0;
 let cardDeck = [];
+const sortedCardDeck = [
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11];
 
-const getCardDeck = () => {
-    let max = 51;
-    let sortedCardDeck = [
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-        11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11];
-        for (let i = 0; i < 52; i++) {
-            const randomNumber = Math.floor(Math.random() * (max));
-            const randomCard = sortedCardDeck.splice(randomNumber, 1);
-            max--;
-            cardDeck.push(randomCard[0])
-        }
+const getRandomCardDeck = (array) => {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+const compareNumber = () => {
+    if (youCardSum > dealerCardSum || dealerCardSum > 21) {
+        renderYouWin();
+    } else if (youCardSum < dealerCardSum) {
+        renderDealerWin();
+    } else {
+        renderDraws();
+    }
+}
+
+const renderYouWin = () => {
+    playerAsset = playerAsset + Number(input.value)
+    win++;
+    getAndStopCardBox.id = 'display';
+    endGameBtnBox.removeAttribute('id');
+    infoTextBox.innerHTML = `승리하였습니다!`;
+    youCardsTextBox.innerHTML = `플레이어: [${youCardSum}] <br> 딜러: [${dealerCardSum}]`;
+    sumTextBox.innerHTML = "";
+    playerAssetTextBox.innerHTML = `현재 자산: ${playerAsset}`;
+}
+
+const renderDealerWin = () => {
+    playerAsset = playerAsset - Number(input.value)
+    lose++;
+    getAndStopCardBox.id = 'display';
+    endGameBtnBox.removeAttribute('id');
+    infoTextBox.innerHTML = `패배하였습니다. 한 게임 더 하시겠습니까?`;
+    youCardsTextBox.innerHTML = `플레이어: [${youCardSum}] <br> 딜러: [${dealerCardSum}]`;
+    sumTextBox.innerHTML = "";
+    playerAssetTextBox.innerHTML = `현재 자산: ${playerAsset}`;
+}
+
+const renderDraws = () => {
+    draws++;
+    getAndStopCardBox.id = 'display';
+    endGameBtnBox.removeAttribute('id');
+    infoTextBox.innerHTML = `비겼습니다!`;
+    youCardsTextBox.innerHTML = `플레이어: [${youCardArray}] <br> 딜러: [${dealerCardSum}]`;
+    sumTextBox.innerHTML = `총합: ${youCardSum}`;
+    playerAssetTextBox.innerHTML = `현재 자산: ${playerAsset}`;
+}
+
+const main = () => {
+    getYouCard();
+    renderResultGame();
+    checkYouNumber();
 }
 
 const getYouCard = () => {
@@ -38,131 +85,128 @@ const getYouCard = () => {
     youCardArray.push(card);
 }
 
-const printGame = () => {
-    messageBox.textContent = `Game: ${round}`
-    youCards.textContent = `플레이어: [${youCardArray}]`
-    sumBox.textContent = `총합: ${youCardSum}`;
-    playerAssetMessageBox.textContent = `현재 자산: ${playerAsset}`;
+const renderResultGame = () => {
+    infoTextBox.innerHTML = `Game: ${round}`
+    youCardsTextBox.innerHTML = `플레이어: [${youCardArray}]`
+    sumTextBox.innerHTML = `총합: ${youCardSum}`;
+    playerAssetTextBox.innerHTML = `현재 자산: ${playerAsset}`;
 }
 
-const isAlive = () => {
-    if (youCardSum > 21 || youCardSum === 21) {
-        endGamePrint()
-    }
-}
-
-const compareNumber = () => {
-    if (youCardSum < dealerCardSum) {
-        lose++;
-        document.querySelector(".get-card-box").id = 'display';
-        document.querySelector(".end-box").removeAttribute('id');
-        messageBox.innerHTML = `패배하였습니다. 한 게임 더 하시겠습니까? <br> 현재 자산 : ${playerAsset}`;
-        youCards.innerHTML = `플레이어: [${youCardSum}] <br> 딜러: [${dealerCardSum}]`;
-        sumBox.textContent = "";
-    } else if (youCardSum > dealerCardSum) {
-        playerAsset = playerAsset + input
-        win++;
-        document.querySelector(".get-card-box").id = 'display';
-        document.querySelector(".end-box").removeAttribute('id');
-        messageBox.innerHTML = `승리하였습니다! <br> 현재 자산 : ${playerAsset}`;
-        youCards.innerHTML = `플레이어: [${youCardSum}] <br> 딜러: [${dealerCardSum}]`;
-        sumBox.textContent = "";
-    }
-}
-
-const main = () => {
-    getYouCard();
-    printGame();
-    isAlive();
-}
-
-const endGamePrint = () => {
+const checkYouNumber = () => {
     if (youCardSum > 21) {
+        playerAsset = playerAsset - Number(input.value);
         lose++;
-        document.querySelector(".get-card-box").id = 'display';
-        document.querySelector(".end-box").removeAttribute('id');
-        messageBox.innerHTML = `패배하였습니다. 한 게임 더 하시겠습니까? <br> 현재 자산 : ${playerAsset}`;
-        youCards.textContent = `플레이어: [${youCardArray}]`;
-        sumBox.textContent = `총합: ${youCardSum}`;
+        getAndStopCardBox.id = 'display';
+        endGameBtnBox.removeAttribute('id');
+        infoTextBox.innerHTML = `패배하였습니다. 한 게임 더 하시겠습니까?`;
+        youCardsTextBox.innerHTML = `플레이어: [${youCardArray}]`;
+        sumTextBox.innerHTML = `총합: ${youCardSum}`;
+        playerAssetTextBox.innerHTML = `현재 자산: ${playerAsset}`;
     } else if (youCardSum === 21) {
-        playerAsset = playerAsset + (input * 2);
+        playerAsset = playerAsset + (input.value * 2);
         win++;
-        document.querySelector(".get-card-box").id = 'display';
-        document.querySelector(".end-box").removeAttribute('id');
-        messageBox.innerHTML = `승리하였습니다! <br> 현재 자산 : ${playerAsset}`;
-        youCards.textContent = `플레이어: [${youCardArray}]`;
-        sumBox.textContent = `총합: ${youCardSum}`;
+        getAndStopCardBox.id = 'display';
+        endGameBtnBox.removeAttribute('id');
+        infoTextBox.innerHTML = `승리하였습니다!`;
+        youCardsTextBox.innerHTML = `플레이어: [${youCardArray}]`;
+        sumTextBox.innerHTML = `총합: ${youCardSum}`;
+        playerAssetTextBox.innerHTML = `현재 자산: ${playerAsset}`;
     }
-}
-
-const startGame = () => {
-    if (playerAsset === 0) {
-        emptyAssetPrint()
-    } else {
-        document.querySelector(".input-box").id = 'display';
-        document.querySelector(".get-card-box").removeAttribute('id');
-        playerAsset = playerAsset - input.value;
-        main();
-    }
-}
-
-const showBettingInput = () => {
-    getCardDeck();
-    round++;
-    playerAssetMessageBox.textContent = `현재 자산: ${playerAsset}`;
-    document.querySelector("#start-btn").id = 'display';
-    document.querySelector(".input-box").removeAttribute('id');
-
-}
-
-const restartGame = () => {
-    if (cardDeck.length < 11) {
-        getCardDeck()
-    }
-    messageBox.innerHTML = "배팅할 금액을 입력해주세요"
-    youCards.innerHTML = ""
-    sumBox.innerHTML = ""
-    document.querySelector(".end-box").id = 'display';
-    document.querySelector(".input-box").removeAttribute('id');
-    input.value = null;
-    round++
-    youCardArray = [];
-    youCardSum = 0;
-}
-
-const stopGame = () => {
-    round = 0;
-    youCards.innerHTML = ""
-    sumBox.innerHTML = ""
-    messageBox.innerHTML = `${win}승 ${draws}무 ${lose}패로 ${playerAsset}원의 자산이 남았습니다. <br> 플레이 해주셔서 감사합니다.`
-    document.querySelector(".end-box").id = 'display';
-    document.querySelector(".reset-game").removeAttribute('id');
 }
 
 const getDealerCard = () => {
+    dealerCardSum = 0;
+    dealerCardArray = [];
     while (dealerCardSum < 17) {
         const card = cardDeck.shift();
         dealerCardSum = dealerCardSum + card;
         dealerCardArray.push(card);
-        console.log(dealerCardSum);
     }
-    console.log(cardDeck)
-    compareNumber()
+
+    if (dealerCardSum > 21) {
+        renderYouWin();
+    } else if (dealerCardSum === 21) {
+        renderDealerWin()
+    } else {
+        compareNumber()
+    }
 }
 
-const emptyAssetPrint = () => {
-    messageBox.innerHTML = "자산이 없습니다.";
-    youCards.innerHTML = "";
-    sumBox.innerHTML = "";
-    document.querySelector(".input-box").id = 'display';
-    document.querySelector(".reset-game").removeAttribute('id');
+const checkValue = () => {
+    if (input.value > playerAsset || input.value < 100 || isNaN(input.value) || input.value % 100 !== 0) {
+        alert("100원 단위로 입력해주세요.");
+        showBettingInput()
+    }
+}
+
+const startGame = () => {
+    checkValue()
+    if (playerAsset === 0) {
+        renderEmptyAssetMessage()
+    } else {
+        inputBox.id = 'display';
+        getAndStopCardBox.removeAttribute('id');
+        codeSquadBtnBox.removeAttribute('id');
+        main();
+    }
+}
+
+const renderEmptyAssetMessage = () => {
+    inputBox.id = 'display';
+    resetBtnBox.removeAttribute('id');
+    infoTextBox.innerHTML = "자산이 없습니다.";
+    youCardsTextBox.innerHTML = "";
+    sumTextBox.innerHTML = "";
+}
+
+const showBettingInput = () => {
+    startBtnBox.id = 'display';
+    inputBox.removeAttribute('id');
+    cardDeck = getRandomCardDeck(sortedCardDeck);
+    round++;
+    playerAssetTextBox.innerHTML = `현재 자산: ${playerAsset}`;
+}
+
+const restartGame = () => {
+    if (cardDeck.length < 11) {
+        cardDeck = getRandomCardDeck(sortedCardDeck);
+    }
+    endGameBtnBox.id = 'display';
+    inputBox.removeAttribute('id');
+    infoTextBox.innerHTML = "배팅할 금액을 입력해주세요"
+    youCardsTextBox.innerHTML = ""
+    sumTextBox.innerHTML = ""
+    input.value = null;
+    round++
+    youCardArray = [];
+    youCardSum = 0;
+    playerAssetTextBox.innerHTML = `현재 자산: ${playerAsset}`;
+}
+
+const stopGame = () => {
+    youCardsTextBox.innerHTML = ""
+    sumTextBox.innerHTML = ""
+    infoTextBox.innerHTML = `${win}승 ${draws}무 ${lose}패로 ${playerAsset}원의 자산이 남았습니다. <br> 플레이 해주셔서 감사합니다.`
+    endGameBtnBox.id = 'display';
+    resetBtnBox.removeAttribute('id');
+    codeSquadBtnBox.id = 'display';
 }
 
 const resetGame = () => {
     location.reload();
 }
 
-const EventHandler = () => {
+const showDeck = () => {
+    const arrSixCard = [];
+    for (let i = 0; i < 6; i++) {
+        const card = cardDeck[i];
+        arrSixCard.push(card);
+    }
+    alert(arrSixCard);
+    codeSquadBtnBox.id = 'display';
+}
+
+const gatherEventHandler = () => {
     const startBtn = document.querySelector("#start-btn");
     startBtn.addEventListener("click", showBettingInput);
 
@@ -184,7 +228,8 @@ const EventHandler = () => {
     const resetGameBtn = document.querySelector(".reset-game");
     resetGameBtn.addEventListener("click", resetGame);
 
-
+    const codeSquadBtn = document.querySelector(".code-squad");
+    codeSquadBtn.addEventListener("click", showDeck);
 }
 
 EventHandler()
