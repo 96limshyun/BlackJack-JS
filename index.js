@@ -7,7 +7,7 @@ const getAndStopCardBox = document.querySelector(".get-card-box");
 const endGameBtnBox = document.querySelector(".end-box");
 const inputBox = document.querySelector(".input-box");
 const codeSquadBtnBox = document.querySelector(".code-squad");
-const resetBtnBox = document.querySelector(".reset-game");
+const resetBtnBox = document.querySelector(".reset-box");
 const startBtnBox =  document.querySelector("#start-btn");
 
 let playerAsset = 1000;
@@ -132,27 +132,32 @@ const getDealerCard = () => {
     }
 }
 
-const checkValue = () => {
-    if (input.value > playerAsset || input.value < 100 || isNaN(input.value) || input.value % 100 !== 0) {
+const checkInputValue = () => {
+    if (input.value > playerAsset || input.value < 100 || isNaN(input.value) || input.value % 100 !== 0 || input.value === "" ) {
         alert("100원 단위로 입력해주세요.");
-        showBettingInput()
+        return true;
+    } else {
+        return false;
     }
 }
 
 const startGame = () => {
-    checkValue()
-    if (playerAsset === 0) {
-        renderEmptyAssetMessage()
-    } else {
+    let alive = checkInputValue()
+    if (!alive) {
+        round++;
         inputBox.id = 'display';
         getAndStopCardBox.removeAttribute('id');
         codeSquadBtnBox.removeAttribute('id');
         main();
+    } else {
+        showBettingInput()
     }
 }
 
 const renderEmptyAssetMessage = () => {
+    endGameBtnBox.id = 'display';
     inputBox.id = 'display';
+    codeSquadBtnBox.id = 'display';
     resetBtnBox.removeAttribute('id');
     infoTextBox.innerHTML = "자산이 없습니다.";
     youCardsTextBox.innerHTML = "";
@@ -163,24 +168,25 @@ const showBettingInput = () => {
     startBtnBox.id = 'display';
     inputBox.removeAttribute('id');
     cardDeck = getRandomCardDeck(sortedCardDeck);
-    round++;
     playerAssetTextBox.innerHTML = `현재 자산: ${playerAsset}`;
 }
 
 const restartGame = () => {
     if (cardDeck.length < 11) {
         cardDeck = getRandomCardDeck(sortedCardDeck);
+    } else if (playerAsset === 0) {
+        renderEmptyAssetMessage()
+    } else {
+        endGameBtnBox.id = 'display';
+        inputBox.removeAttribute('id');
+        infoTextBox.innerHTML = "배팅할 금액을 입력해주세요"
+        youCardsTextBox.innerHTML = ""
+        sumTextBox.innerHTML = ""
+        input.value = null;
+        youCardArray = [];
+        youCardSum = 0;
+        playerAssetTextBox.innerHTML = `현재 자산: ${playerAsset}`;
     }
-    endGameBtnBox.id = 'display';
-    inputBox.removeAttribute('id');
-    infoTextBox.innerHTML = "배팅할 금액을 입력해주세요"
-    youCardsTextBox.innerHTML = ""
-    sumTextBox.innerHTML = ""
-    input.value = null;
-    round++
-    youCardArray = [];
-    youCardSum = 0;
-    playerAssetTextBox.innerHTML = `현재 자산: ${playerAsset}`;
 }
 
 const stopGame = () => {
@@ -225,11 +231,11 @@ const gatherEventHandler = () => {
     const stopGameBtn = document.querySelector(".stop-game-btn");
     stopGameBtn.addEventListener("click", stopGame);
 
-    const resetGameBtn = document.querySelector(".reset-game");
+    const resetGameBtn = document.querySelector(".reset-box");
     resetGameBtn.addEventListener("click", resetGame);
 
     const codeSquadBtn = document.querySelector(".code-squad");
     codeSquadBtn.addEventListener("click", showDeck);
 }
 
-EventHandler()
+gatherEventHandler()
