@@ -3,7 +3,7 @@
 ---------------------
 
 ## 실행화면
-(https://github.com/limsbong/BlackJack-JS/assets/126482821/22572082-5f74-4fa0-a0c7-c48c4f9c5196)
+https://github.com/limsbong/BlackJack-JS/assets/126482821/22572082-5f74-4fa0-a0c7-c48c4f9c5196
 
 ---------------------
 ## Content
